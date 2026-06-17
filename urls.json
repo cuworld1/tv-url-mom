@@ -1,6 +1,22 @@
 {
-  "tvwiki": { "channel": "tvwiki_url", "url": "https://tvwiki28.net", "updated": "" },
-  "tvmon":  { "channel": "tvmon_noti", "url": "https://tvmon1.com", "updated": "" },
-  "mvking": { "channel": "mvking777", "url": "https://mvking.wiki", "updated": "" },
-  "tvroom": { "channel": "tvroom8282", "url": "https://tvroom.one", "updated": "" }
+  "tvwiki": {
+    "channel": "tvwiki_url",
+    "url": "https://tvwiki29.net",
+    "updated": "2026-06-17T12:39:01.471Z"
+  },
+  "tvmon": {
+    "channel": "tvmon_noti",
+    "url": "https://tvmon1.com",
+    "updated": ""
+  },
+  "mvking": {
+    "channel": "mvking777",
+    "url": "https://mvking.wiki",
+    "updated": ""
+  },
+  "tvroom": {
+    "channel": "tvroom8282",
+    "url": "https://tvroom.one",
+    "updated": ""
+  }
 }
