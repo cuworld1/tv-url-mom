@@ -1,0 +1,7 @@
+{
+  "_tlds": ["com", "net", "org", "me", "sbs", "vip", "one", "cc", "top", "mov", "wiki", "tv", "site", "co", "xyz"],
+  "tvwiki": { "base": "tvwiki", "from": 1, "to": 40, "manual": [] },
+  "tvhot":  { "base": "tvhot", "from": 1, "to": 40, "manual": [] },
+  "mvking": { "base": "mvking", "from": 1, "to": 40, "manual": [] },
+  "tvroom": { "base": "tvroom", "from": 1, "to": 40, "manual": [] }
+}
