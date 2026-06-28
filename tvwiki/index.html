@@ -12,26 +12,28 @@
 <div id="m"></div>
 <script>
 (function(){
-  var KEY='tvwiki', ck='tvu2_'+KEY;
+  var KEY='tvwiki', ck='tvu3_'+KEY;
   function done(u){ try{localStorage.setItem(ck,u);}catch(e){} location.replace(u); }
   function msg(s){ document.getElementById('m').innerHTML=s; }
-  // probe: 2=favicon성공(강함), 1=fetch만(약함), 0=실패
-  function probe(u){ return new Promise(function(res){ var fav=0,fet=0,n=0,fin=false; function chk(){ if(fin)return; if(n>=2){ fin=true; res(fav?2:(fet?1:0)); } } var img=new Image(); var t1=setTimeout(function(){img.onload=img.onerror=null;n++;chk();},4000); img.onload=function(){clearTimeout(t1);fav=1;n++;chk();}; img.onerror=function(){clearTimeout(t1);n++;chk();}; img.src=u+'/favicon.ico?x='+Date.now(); var ac=new AbortController(); var t2=setTimeout(function(){try{ac.abort();}catch(e){}n++;chk();},4000); fetch(u,{mode:'no-cors',cache:'no-store',signal:ac.signal}).then(function(){clearTimeout(t2);fet=1;n++;chk();}).catch(function(){clearTimeout(t2);n++;chk();}); }); }
-  // 정해진 순서대로 + 배치 내 favicon 우선 → 모든 기기 동일 결과(결정적)
-  function pickInOrder(list,batch){ var i=0; function nb(){ if(i>=list.length) return Promise.resolve(null); var s=list.slice(i,i+batch); i+=batch; return Promise.all(s.map(function(u){return probe(u).then(function(k){return {u:u,k:k};});})).then(function(rs){ for(var j=0;j<rs.length;j++){ if(rs[j].k===2) return rs[j].u; } for(var j2=0;j2<rs.length;j2++){ if(rs[j2].k===1) return rs[j2].u; } return nb(); }); } return nb(); }
-  function genList(d,cfg){ var L=[]; var base=cfg.base, lo=cfg.from||1, to=cfg.to||40, tlds=d._tlds||['com']; var c=null; try{c=localStorage.getItem(ck);}catch(e){} var lastN=0; if(c){ var cm=c.match(/(\d+)\./); if(cm) lastN=parseInt(cm[1],10); } var hi=Math.max(to,lastN+30); tlds.forEach(function(t){ var u0='https://'+base+'.'+t; if(L.indexOf(u0)<0) L.push(u0); for(var n=hi;n>=lo;n--){ var u='https://'+base+n+'.'+t; if(L.indexOf(u)<0) L.push(u); } }); return L; }
+  function probe(u){ return new Promise(function(res){ var fin=false,fails=0; function hit(ok){ if(fin)return; if(ok){fin=true;res(true);} else if(++fails>=2){fin=true;res(false);} } var img=new Image(); var t1=setTimeout(function(){img.onload=img.onerror=null;hit(false);},4000); img.onload=function(){clearTimeout(t1);hit(true);}; img.onerror=function(){clearTimeout(t1);hit(false);}; img.src=u+'/favicon.ico?x='+Date.now(); var ac=new AbortController(); var t2=setTimeout(function(){try{ac.abort();}catch(e){}},4000); fetch(u,{mode:'no-cors',cache:'no-store',signal:ac.signal}).then(function(){clearTimeout(t2);hit(true);}).catch(function(){clearTimeout(t2);hit(false);}); }); }
+  // 정해진 순서대로 첫 번째 되는 주소 (결정적)
+  function pickInOrder(list,batch){ var i=0; function nb(){ if(i>=list.length) return Promise.resolve(null); var s=list.slice(i,i+batch); i+=batch; return Promise.all(s.map(function(u){return probe(u).then(function(ok){return ok?u:null;});})).then(function(rs){ for(var j=0;j<rs.length;j++){ if(rs[j]) return rs[j]; } return nb(); }); } return nb(); }
+  // 숫자변형: https://name32.net -> name31/33/30/34... (같은 이름+같은 TLD, 숫자만)
+  function numVars(addr){ var m=addr.match(/^https?:\/\/([a-z]+?)(\d+)\.([a-z]{2,8})$/i); if(!m) return []; var nm=m[1],num=parseInt(m[2],10),tld=m[3],out=[]; for(var d=1;d<=15;d++){ out.push('https://'+nm+(num+d)+'.'+tld); if(num-d>0) out.push('https://'+nm+(num-d)+'.'+tld); } return out; }
   fetch('../urls.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
-    var cfg=d[KEY]; if(!cfg){ msg('설정 없음'); return; }
-    var manual=cfg.manual||[];
-    if(manual.length){ done(manual[0]); return; }
+    var cfg=d[KEY]||{}; var manual=cfg.manual||[], auto=cfg.auto||[];
+    if(manual.length){ done(manual[0]); return; }              // 수동 고정 우선
     var c=null; try{c=localStorage.getItem(ck);}catch(e){}
-    var fast = c ? probe(c).then(function(k){return k?c:null;}) : Promise.resolve(null);
-    fast.then(function(cu){
-      if(cu){ done(cu); return; }
-      var L=genList(d,cfg);
-      pickInOrder(L,16).then(function(u){
-        if(u){ done(u); return; }
-        msg('접속 가능한 주소를 못 찾았어요.<br>'+L.slice(0,10).map(function(x){return '<a href="'+x+'">'+x.replace(/^https?:\/\//,'')+'</a>';}).join(''));
+    // 캐시가 공식목록(auto)에 있으면 맨 앞으로 (빠름 + 맞는 사이트 보장)
+    var ordered = (c && auto.indexOf(c)>=0) ? [c].concat(auto.filter(function(x){return x!==c;})) : auto.slice();
+    pickInOrder(ordered,8).then(function(u){
+      if(u){ done(u); return; }                                // 1차: 공식목록에서 되는 주소
+      var vars=[], seen={};
+      auto.forEach(function(a){ numVars(a).forEach(function(v){ if(!seen[v]){seen[v]=1; vars.push(v);} }); });
+      pickInOrder(vars,12).then(function(u2){
+        if(u2){ done(u2); return; }                            // 2차: 숫자변형 폴백
+        var show=auto.concat(manual);
+        msg(show.length ? ('접속 가능한 주소를 못 찾았어요.<br>'+show.slice(0,8).map(function(x){return '<a href="'+x+'">'+x.replace(/^https?:\/\//,'')+'</a>';}).join('')) : '주소 없음 (Actions 실행 필요)');
       });
     });
   }).catch(function(){ msg('불러오기 실패'); });
