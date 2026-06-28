@@ -1,6 +1,35 @@
 {
-  "tvwiki": { "name": "tvwiki", "channel": "tvwiki_url", "manual": [], "auto": ["https://tvwiki32.net"] },
-  "tvhot":  { "name": "tvhot", "page": "https://www.jusoland1.com/", "manual": [], "auto": ["https://tvhot2.com"] },
-  "mvking": { "name": "mvking", "channel": "mvking777", "manual": [], "auto": [] },
-  "tvroom": { "name": "tvroom", "channel": "tvroom8282", "manual": [], "auto": ["https://tvroom.sbs"] }
+  "tvwiki": {
+    "name": "tvwiki",
+    "channel": "tvwiki_url",
+    "manual": [],
+    "auto": [
+      "https://tvwiki34.net",
+      "https://tvwiki32.net"
+    ]
+  },
+  "tvhot": {
+    "name": "tvhot",
+    "page": "https://www.jusoland1.com/",
+    "manual": [],
+    "auto": [
+      "https://tvhot2.com"
+    ]
+  },
+  "mvking": {
+    "name": "mvking",
+    "channel": "mvking777",
+    "manual": [],
+    "auto": [
+      "https://mvking8.org"
+    ]
+  },
+  "tvroom": {
+    "name": "tvroom",
+    "channel": "tvroom8282",
+    "manual": [],
+    "auto": [
+      "https://tvroom16.org"
+    ]
+  }
 }
