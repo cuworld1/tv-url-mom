@@ -40,13 +40,14 @@ async function fromTelegram(channel, name) {
   if (!html) return [];
   const blocks = html.split('tgme_widget_message_wrap').slice(1);
   if (!blocks.length) return [];
-  // 최신 메시지부터(마지막 블록) 역순으로, 주소가 있는 첫 메시지의 주소 전부
-  const recent = blocks.slice(-4).reverse();
+  // 최근 메시지들에서 공식 주소를 "전부" 누적 (최신 우선, 중복 제거) → 미러 여러 개 확보
+  const recent = blocks.slice(-15).reverse();
+  const out = [];
   for (const b of recent) {
-    const found = extractAll(b, name);
-    if (found.length) return found;
+    extractAll(b, name).forEach((u) => { if (out.indexOf(u) < 0) out.push(u); });
+    if (out.length >= 12) break;
   }
-  return [];
+  return out;
 }
 
 async function fromPage(pageUrl, name) {
@@ -66,8 +67,11 @@ async function fromPage(pageUrl, name) {
     if (site.channel) auto = await fromTelegram(site.channel, name);
     else if (site.page) auto = await fromPage(site.page, name);
     if (auto.length) {
-      site.auto = auto;
-      console.log(key + ' -> ' + auto.join(', '));
+      // 병합: 새로 수집한 것(최신) 먼저 + 기존 것 보존(중복 제거) → 알려진 미러 유실 방지
+      const merged = auto.slice();
+      (site.auto || []).forEach((u) => { if (merged.indexOf(u) < 0) merged.push(u); });
+      site.auto = merged.slice(0, 15);
+      console.log(key + ' -> ' + site.auto.join(', '));
     } else {
       console.log(key + ' -> (수집 실패, 기존 auto 유지)');
     }
