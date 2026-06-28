@@ -1,7 +1,6 @@
 {
-  "_tlds": ["com", "net", "org", "me", "sbs", "vip", "one", "cc", "top", "mov", "wiki", "tv", "site", "co", "xyz"],
-  "tvwiki": { "base": "tvwiki", "from": 1, "to": 40, "manual": [] },
-  "tvhot":  { "base": "tvhot", "from": 1, "to": 40, "manual": [] },
-  "mvking": { "base": "mvking", "from": 1, "to": 40, "manual": [] },
-  "tvroom": { "base": "tvroom", "from": 1, "to": 40, "manual": [] }
+  "tvwiki": { "name": "tvwiki", "channel": "tvwiki_url", "manual": [], "auto": ["https://tvwiki32.net"] },
+  "tvhot":  { "name": "tvhot", "page": "https://www.jusoland1.com/", "manual": [], "auto": ["https://tvhot2.com"] },
+  "mvking": { "name": "mvking", "channel": "mvking777", "manual": [], "auto": [] },
+  "tvroom": { "name": "tvroom", "channel": "tvroom8282", "manual": [], "auto": ["https://tvroom.sbs"] }
 }
