@@ -12,21 +12,14 @@
 <div id="m"></div>
 <script>
 (function(){
-  var KEY='tvwiki', bk='tvb_'+KEY;
+  var KEY='tvwiki';
   function go(u){ location.replace(u); }
   function msg(s){ document.getElementById('m').innerHTML=s; }
-  // 숫자변형(같은 이름+같은 TLD): 막혔을 때 폴백 후보
-  function numVars(addr){ var m=addr.match(/^https?:\/\/([a-z]+?)(\d+)\.([a-z]{2,8})$/i); if(!m) return []; var nm=m[1],num=parseInt(m[2],10),tld=m[3],out=[]; for(var dd=1;dd<=12;dd++){ out.push('https://'+nm+(num+dd)+'.'+tld); if(num-dd>0) out.push('https://'+nm+(num-dd)+'.'+tld); } return out; }
   fetch('../urls.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
     var cfg=d[KEY]||{}; var manual=cfg.manual||[], auto=cfg.auto||[];
-    if(manual.length){ go(manual[0]); return; }                 // 수동 고정 우선
-    var cand=auto.slice();                                       // 공식목록(최신 우선)
-    auto.forEach(function(a){ numVars(a).forEach(function(v){ if(cand.indexOf(v)<0) cand.push(v); }); });
-    if(!cand.length){ msg('주소 없음 (Actions 실행 필요)'); return; }
-    // 바운스: 직전 시도가 15초 내 재방문이면(=막혀서 돌아옴) 다음 후보로
-    var idx=0; try{ var b=JSON.parse(localStorage.getItem(bk)||'null'); if(b && (Date.now()-b.t)<15000){ idx=(b.i+1)%cand.length; } }catch(e){}
-    try{ localStorage.setItem(bk, JSON.stringify({i:idx,t:Date.now()})); }catch(e){}
-    go(cand[idx]);                                               // 최신 공식주소로 바로 연결(검증 없이)
+    if(manual.length){ go(manual[0]); return; }   // 수동 지정 우선
+    if(auto.length){ go(auto[0]); return; }        // 항상 최신 공식주소(auto[0])로만 — 사이클링/numVars 제거
+    msg('주소 없음 (Actions 실행 필요)');
   }).catch(function(){ msg('주소 정보를 불러오지 못했습니다.'); });
 })();
 </script>
