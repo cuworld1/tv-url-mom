@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAflBMVEUAAAD/////UgDv7+/i4uKpNAD/VwD19fX6+vq2trY1EAA3EQCaMACeMQCSkpK/OwCLKwCtra1qamrMzMyTLgDsSQDMPwDYQwDZ2dn0SwBDQ0NZHAC0OABQGQCKiooaCABEFQAOBQBzJAB4eHgaGhqBKACCgoInJyegoKBPT08E8M/vAAAApElEQVQ4je1QxxbDIAyTTQjQ7NWm6U73//9gQzNP7S2n6OBnZIGQgQWzYiXX0vsx93mDwA2Aq1ZCKB2a0tKhunX3Xd4CkRujMonSiUkzqhqeRPfAbs/Mdxxye3Asm5Kx5djOT5yfZcEcxZdeAEFARugFvhUUsh4FR3qAEkwt6qlF4++E9BxCDp8cBS+ibIwZNDF9V3770mk5pd+TRXh/FrVgDnwAF/QHJcKh5NQAAAAASUVORK5CYII=">
+<title>tvmon</title>
+<style>html,body{height:100%;margin:0;background:#111;color:#aaa;font:15px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;text-align:center} a{color:#4ea1ff;display:block;margin:8px 0;text-decoration:none}</style>
+</head>
+<body>
+<div id="m"></div>
+<script>
+(function(){
+  var KEY='tvmon';
+  function go(u){ location.replace(u); }
+  function msg(s){ document.getElementById('m').innerHTML=s; }
+  fetch('../urls.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    var cfg=d[KEY]||{}; var manual=cfg.manual||[], auto=cfg.auto||[];
+    if(manual.length){ go(manual[0]); return; }   // 수동 지정 우선
+    if(auto.length){ go(auto[0]); return; }        // 항상 최신 공식주소(auto[0])로만 — 사이클링/numVars 제거
+    msg('주소 없음 (Actions 실행 필요)');
+  }).catch(function(){ msg('주소 정보를 불러오지 못했습니다.'); });
+})();
+</script>
+</body>
+</html>
