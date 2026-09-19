@@ -8,12 +8,12 @@
       "https://tvwiki50.net"
     ]
   },
-  "tvhot": {
-    "name": "tvhot",
-    "page": "https://www.jusoland1.com/",
+  "tvmon": {
+    "name": "tvmon",
+    "channel": "tvmon_noti",
     "manual": [],
     "auto": [
-      "https://tvhot2.com"
+      "https://tvmon1.com"
     ]
   },
   "mvking": {
